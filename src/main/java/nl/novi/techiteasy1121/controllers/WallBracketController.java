@@ -36,8 +36,10 @@ public class WallBracketController {
         if (name.isEmpty()){
             wallBracketDtos = wallBracketService.getAllWallBrackets();
         } else {
-            wallBracketDtos = wallBracketService.getAllWallBracketsbyName(name.get());
+            wallBracketDtos = wallBracketService.getAllWallBracketsByName(name.get());
         }
+
+        return ResponseEntity.ok().body(wallBracketDtos);
 
    }
 
