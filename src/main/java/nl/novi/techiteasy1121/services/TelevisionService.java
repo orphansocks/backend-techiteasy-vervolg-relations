@@ -3,7 +3,9 @@ package nl.novi.techiteasy1121.services;
 import nl.novi.techiteasy1121.dtos.television.TelevisionDto;
 import nl.novi.techiteasy1121.dtos.television.TelevisionInputDto;
 import nl.novi.techiteasy1121.exceptions.RecordNotFoundException;
+import nl.novi.techiteasy1121.models.RemoteController;
 import nl.novi.techiteasy1121.models.Television;
+import nl.novi.techiteasy1121.repositories.RemoteControllerRepository;
 import nl.novi.techiteasy1121.repositories.TelevisionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,13 +19,18 @@ import java.util.Optional;
 public class TelevisionService {
 
   // DE SERVICELAAG COMMUNICEERT MET DE REPOSITORY
-    // DE VARIABELE
+    // DE VARIABELE (OOK VOOR HET KOPPELEN VAN DE REMOTE)
     private final TelevisionRepository televisionRepository;
+    private final RemoteControllerRepository remoteControllerRepository;
 
-    // GENERATE DE CONSTRUCTOR
-    public TelevisionService(TelevisionRepository televisionRepository){
+    // GENERATE DE CONSTRUCTOR (+ REMOTECONTROLLER)
+    public TelevisionService (TelevisionRepository televisionRepository,
+                              RemoteControllerRepository remoteControllerRepository) {
         this.televisionRepository = televisionRepository;
+        this.remoteControllerRepository = remoteControllerRepository;
     }
+
+    // DE SERVICELAAG FUNCTIONS:
 
     // DIT IS DE METHODE VOOR HET OPVRAGEN VAN ALLE TELEVISIES IN DE REPOSITORY
     // CONTROLLER (DTO) < > SERVICE < > TELEVISIONS (ENTITEIT) IN DE REPOSITORY

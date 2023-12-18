@@ -12,9 +12,13 @@ public class CIModuleService {
 
 
     // GENERATE DE CONSTRUCTOR
-
-
     public CIModuleService(CIModuleRepository ciModuleRepository) {
         this.ciModuleRepository = ciModuleRepository;
     }
 }
+
+// DE SERVICELAAG FUNCTIONS:
+
+// WELKE WIL JE EIGENLIJK ALTIJD HEBBEN??
+
+// BETER GENERIEK HELPERFUNCTIES MAKEN IPV ALLES DUBBEL UITTYPEN??

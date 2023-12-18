@@ -15,6 +15,11 @@ public class RemoteControllerService {
         this.remoteControllerRepository = remoteControllerRepository;
     }
 
+    // DE SERVICELAAG FUNCTIONS:
+    // WELKE WIL JE EIGENLIJK ALTIJD HEBBEN
+
+    // BETER GENERIEK HELPERFUNCTIES MAKEN IPV ALLES DUBBEL UITTYPEN??
+
 
 
 
