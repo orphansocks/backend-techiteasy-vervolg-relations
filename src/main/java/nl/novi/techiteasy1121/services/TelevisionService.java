@@ -1,9 +1,11 @@
 package nl.novi.techiteasy1121.services;
 
-import nl.novi.techiteasy1121.Dtos.TelevisionDto;
-import nl.novi.techiteasy1121.Dtos.TelevisionInputDto;
+import nl.novi.techiteasy1121.dtos.television.TelevisionDto;
+import nl.novi.techiteasy1121.dtos.television.TelevisionInputDto;
 import nl.novi.techiteasy1121.exceptions.RecordNotFoundException;
+import nl.novi.techiteasy1121.models.RemoteController;
 import nl.novi.techiteasy1121.models.Television;
+import nl.novi.techiteasy1121.repositories.RemoteControllerRepository;
 import nl.novi.techiteasy1121.repositories.TelevisionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,21 +14,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// Zet de annotatie boven de klasse, zodat Spring het herkent en inleest als Service.
+// @SERVICE WANT SPRING HERKENT DEZE ANNOTATIE
 @Service
 public class TelevisionService {
 
-    // We importeren de repository nu in de service in plaats van in de controller.
-    // dit mag met constructor injection of autowire.
+  // DE SERVICELAAG COMMUNICEERT MET DE REPOSITORY
+    // DE VARIABELE (OOK VOOR HET KOPPELEN VAN DE REMOTE)
     private final TelevisionRepository televisionRepository;
+    private final RemoteControllerRepository remoteControllerRepository;
 
-    public TelevisionService(TelevisionRepository televisionRepository){
+    // GENERATE DE CONSTRUCTOR (+ REMOTECONTROLLER)
+    public TelevisionService (TelevisionRepository televisionRepository,
+                              RemoteControllerRepository remoteControllerRepository) {
         this.televisionRepository = televisionRepository;
+        this.remoteControllerRepository = remoteControllerRepository;
     }
 
-    // Vanuit de repository kunnen we een lijst van Televisions krijgen, maar de communicatie container tussen Service en
-    // Controller is de Dto. We moeten de Televisions dus vertalen naar TelevisionDtos. Dit moet een voor een, omdat
-    // de translateToDto() methode geen lijst accepteert als argument, dus gebruiken we een for-loop.
+    // DE SERVICELAAG FUNCTIONS:
+
+    // DIT IS DE METHODE VOOR HET OPVRAGEN VAN ALLE TELEVISIES IN DE REPOSITORY
+    // CONTROLLER (DTO) < > SERVICE < > TELEVISIONS (ENTITEIT) IN DE REPOSITORY
+    // AAN DE REPOSITORY KAN JE EEN LIJST MET TELEVISIONS VRAGEN (GETALLTELEVISIONS)
+    // DIE DE SERVICE MOET VERTALEN NAAR DTO'S OM TERUG TE GEVEN AAN DE CONTROLLER
+
     public List<TelevisionDto> getAllTelevisions() {
         List<Television> tvList = televisionRepository.findAll();
         List<TelevisionDto> tvDtoList = new ArrayList<>();
@@ -38,9 +48,11 @@ public class TelevisionService {
         return tvDtoList;
     }
 
-    // Vanuit de repository kunnen we een lijst van Televisions met een bepaalde brand krijgen, maar de communicatie
-    // container tussen Service en Controller is de Dto. We moeten de Televisions dus vertalen naar TelevisionDtos. Dit
-    // moet een voor een, omdat de translateToDto() methode geen lijst accepteert als argument, dus gebruiken we een for-loop.
+    // DIT IS DE METHODE VOOR HET OPVRAGEN VAN TELEVISIES PER CATEGORIE IN DE REPOSITORY
+    // CONTROLLER (DTO) < > SERVICE < > TELEVISIONS (ENTITEIT) IN DE REPOSITORY
+    // AAN DE REPOSITORY KAN JE SPECIEFIEKE TELEVISIES OPRAGEN (IN DIT GEVAL PER BRAND)
+    // DE SERVICE MOET VERTALEN NAAR LIJST MET DTO'S OM TERUG TE GEVEN AAN DE CONTROLLER
+
     public List<TelevisionDto> getAllTelevisionsByBrand(String brand) {
         List<Television> tvList = televisionRepository.findAllTelevisionsByBrandEqualsIgnoreCase(brand);
         List<TelevisionDto> tvDtoList = new ArrayList<>();
@@ -52,8 +64,12 @@ public class TelevisionService {
         return tvDtoList;
     }
 
-    // Deze methode is inhoudelijk hetzelfde als het was in de vorige opdracht. Wat verandert is, is dat we nu checken
-    // op optional.isPresent in plaats van optional.isEmpty en we returnen een TelevisionDto in plaats van een Television.
+    // DIT IS DE METHODE VOOR HET OPVRAGEN VAN 1 TELEVISIE IN DE REPOSITORY
+    // CONTROLLER (DTO) < > SERVICE < > TELEVISION (ENTITEIT) IN DE REPOSITORY
+    // AAN DE REPOSITORY KAN JE EEN SPECIEFIEKE TELEVISIES OPRAGEN (IN DIT GEVAL PER ID)
+    // DE SERVICE MOET VERTALEN NAAR DTO OM TERUG TE GEVEN AAN DE CONTROLLER
+    // BIJ NIET GEVONDEN GEEF JE EEN RECORDNOTFOUND TERUG
+
     public TelevisionDto getTelevisionById(Long id) {
         Optional<Television> televisionOptional = televisionRepository.findById(id);
         if (televisionOptional.isPresent()){
@@ -64,9 +80,15 @@ public class TelevisionService {
         }
     }
 
-    // In deze methode moeten we twee keer een vertaal methode toepassen.
-    // De eerste keer van dto naar televsion, omdat de parameter een dto is.
-    // De tweede keer van television naar dto, omdat de return waarde een dto is.
+
+
+    // DIT IS DE METHODE VOOR HET TOEVOEGEN VAN 1 TELEVISIE IN DE REPOSITORY
+    // DE INPUT DTO KOMT BINNEN EN WORDT EEN TV (TRANSFERTOTELEVISION)
+    // CONTROLLER (DTO) < > SERVICE < > TELEVISION (TV) (ENTITEIT) IN DE REPOSITORY
+    // DE TV WORDT OPGESLAGEN
+    // EN WORDT WEER TERUG GEGEVEN ALS EEN TRANSFERTODTO
+
+
     public TelevisionDto addTelevision(TelevisionInputDto dto) {
 
         Television tv = transferToTelevision(dto);
@@ -75,15 +97,23 @@ public class TelevisionService {
         return transferToDto(tv);
     }
 
-    // Deze methode is inhoudelijk neit veranderd. Het is alleen verplaatst naar de Service laag.
+    // DIT IS DE METHODE VOOR HET VERWIJDEREN VAN EEN TELEVISIE UIT DE REPOSITORY
+    // JE HEBT HIER NATUURLIJK DE UNIEKE ID VOOR NODIG
     public void deleteTelevision(@RequestBody Long id) {
 
         televisionRepository.deleteById(id);
 
     }
 
-    // Deze methode is inhoudelijk niet veranderd, alleen staat het nu in de Service laag en worden er Dto's en
-    // vertaal methodes gebruikt.
+// DIT IS DE METHODE OM DE DATE IN EEN TELEVISION OPGESLAGEN IN DE REPOSITORY TE WIJZIGEN
+    // JE HEBT HIER NATUURLIJK DE UNIEKE ID VOOR NODIG EN DE JUISTE DATA
+    // ALS DE DATA IN DE REPOSITORY AANWEZIG IS, HAAL DAN ALLE DATA OP (GET) EN GEEF TERUG ALS DTO
+    // BIJ NIET GEVONDEN THROW RECORDNOTFOUND
+
+    // CONTROLLER (DTO) < > SERVICE < > TELEVISION (TV) (ENTITEIT) IN DE REPOSITORY
+
+    // TRANSFERTODTO (CONTROLLER) < UPDATETELEVISION (SERVICE) > TRANSFERTELEVISION (REPOSITORY)
+
     public TelevisionDto updateTelevision(Long id, TelevisionInputDto newTelevision) {
 
         Optional<Television> televisionOptional = televisionRepository.findById(id);
@@ -109,6 +139,7 @@ public class TelevisionService {
             television1.setType(newTelevision.getType());
             television1.setVoiceControl(newTelevision.getVoiceControl());
             television1.setWifi(newTelevision.getWifi());
+
             Television returnTelevision = televisionRepository.save(television1);
 
             return transferToDto(returnTelevision);
@@ -121,7 +152,8 @@ public class TelevisionService {
 
     }
 
-    // Dit is de vertaal methode van TelevisionInputDto naar Television.
+// DIT IS DE METHOD VOOR HET VERTALEN VAN DE UPDATE NAAR DE TELEVISION IN DE REPOSITORY
+
     public Television transferToTelevision(TelevisionInputDto dto){
         var television = new Television();
 
@@ -145,7 +177,7 @@ public class TelevisionService {
         return television;
     }
 
-    // Dit is de vertaal methode van Television naar TelevisionDto
+    // DIT IS DE METHOD VOOR HET VERTALEN VAN DE TELEVISIE NAAR DE DTO IN DE CONTROLLER
     public TelevisionDto transferToDto(Television television){
         TelevisionDto dto = new TelevisionDto();
 
