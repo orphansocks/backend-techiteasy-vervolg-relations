@@ -82,7 +82,7 @@ public class WallBracketService {
         }
         WallBracket storedWallBracket = wallBracketRepository.findById(id).orElse(null);
 
-        storedWallBracket.setId(wallBracketDto.getId());
+        //storedWallBracket.setId(wallBracketDto.getId());
         storedWallBracket.setSize(wallBracketDto.getSize());
         storedWallBracket.setAdjustable(wallBracketDto.getAdjustable());
         storedWallBracket.setName(wallBracketDto.getName());
