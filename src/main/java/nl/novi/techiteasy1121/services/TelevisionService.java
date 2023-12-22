@@ -72,6 +72,7 @@ public class TelevisionService {
 
     public TelevisionDto getTelevisionById(Long id) {
         Optional<Television> televisionOptional = televisionRepository.findById(id);
+
         if (televisionOptional.isPresent()){
             Television tv = televisionOptional.get();
             return transferToDto(tv);

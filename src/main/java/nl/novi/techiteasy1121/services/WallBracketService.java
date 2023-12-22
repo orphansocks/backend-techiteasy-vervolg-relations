@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// DEZE KLASSE BEVATE DE SERVICEMETHODES VAN DE WALLBRACKET
+// DEZE KLASSE BEVAT DE SERVICEMETHODES VAN DE WALLBRACKET
 @Service
 public class WallBracketService {
 
-    // DE SERVICE COMMUNICEERT MET DE REPOSITORY
+    // DE SERVICELAAG COMMUNICEERT MET DE REPOSITORY
     private WallBracketRepository wallBracketRepository;
 
     // DE CONSTRUCTOR
@@ -23,12 +23,10 @@ public class WallBracketService {
         this.wallBracketRepository = wallBracketRepository;
     }
 
-    // WELKE WIL JE EIGENLIJK ALTIJD HEBBEN??
-
 // BETER GENERIEK HELPERFUNCTIES MAKEN IPV ALLES DUBBEL UITTYPEN??
 
-    // DE METHODE VOOR HET OPHALEN VAN DE WALLBRACKETS VANUIT DE CONTROLLER
-    // CONTROLLER (DTO) < > SERVICE < > TELEVISIONS (ENTITEIT) IN DE REPOSITORY
+    // DE METHODE VOOR HET OPHALEN VAN DE WALLBRACKETS UIT DE REPOSITORY
+    // CONTROLLER (TELEVISIONDTO) < > DE SERVICE KOPPELT < > TELEVISIONS (ENTITEIT) IN DE REPOSITORY
     public List<WallBracketDto> getAllWallBrackets() {
         List<WallBracket> wallBracketList = wallBracketRepository.findAll();
         List<WallBracketDto> dtos = new ArrayList<>();
@@ -39,15 +37,16 @@ public class WallBracketService {
         return dtos;
     }
 
-    //DIT IS DE METHODE OM 1 WALLBRACKET PER ID OP TE HALEN
+    // DIT IS DE METHODE OM 1 WALLBRACKET PER ID OP TE HALEN
     // ALS DE MOGELIJKE WALLBRACKET IS GEVONDEN IN DE REPOSITORY
     // DAN IS DE GEVRAAGDE WALLBRACKET PER ID GELIJK AAN DE DTO
-    // RETURN DAN DIE DTO
-    public List<WallBracketDto> getWallBracket(long id) {
-        Optional<WallBracket> wallBracket = wallBracketRepository.findById(id);
-        if (wallBracket.isPresent()) {
-            WallBracketDto dto = transferToDto(wallBracket.get());
-            return dto;
+    // STOP DAN DIE WALLBRACKET IN DE TRANSFER EN RETURN
+    public WallBracketDto getWallBracket(Long id) {
+        Optional<WallBracket> wallBracketOptional = wallBracketRepository.findById(id);
+
+        if (wallBracketOptional.isPresent()) {
+            WallBracket wallBracket = wallBracketOptional.get();
+            return transferToDto(wallBracket);
         } else {
             throw new RecordNotFoundException("No Wallbracket found");
         }
@@ -94,7 +93,7 @@ public class WallBracketService {
 
     // DE METHODE VOOR HET VERTALEN VAN DE WALLBRACKET NAAR DE WALLBRACKETDTO
     // DIE EEN WALLBRACKET VERWACHT
-    // GEBRUIKT DE GET AND SET VAN DE WALLBRACKETDTO
+    // NEW IS DE DTO DUS DTO.SET en GET FROM WALLBRACKET
     public WallBracketDto transferToDto(WallBracket wallBracket) {
         WallBracketDto dto = new WallBracketDto();
 
@@ -108,6 +107,10 @@ public class WallBracketService {
 
     }
 
+    // DE METHODE DIE DE INPUTDTO OMZET NAAR DE WALLBRACKETMODEL
+    // DTO <> SERVICE <> MODELENTITY
+    // INGEGEVEN WORDT DE INPUTDTO
+    // TERUGGEGEVEN WORDT DE WALLBRACKET MODELENTITY
     public WallBracket transferToWallBracket(WallBracketInputDto wallBracketInputDto) {
         WallBracket wallBracket = new WallBracket();
 

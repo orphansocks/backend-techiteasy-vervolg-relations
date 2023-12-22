@@ -47,7 +47,7 @@ public class WallBracketController {
 
     @PostMapping()
     public ResponseEntity<WallBracketDto> addWallBracket(@RequestBody WallBracketInputDto dto) {
-        WallBracketDto wallBracket = wallBracketService.addWallbracket(dto);
+        WallBracketDto wallBracket = wallBracketService.addWallBracket(dto);
         return ResponseEntity.created(null).body(wallBracket);
     }
 
