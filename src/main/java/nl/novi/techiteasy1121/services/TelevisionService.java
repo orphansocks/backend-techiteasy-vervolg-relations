@@ -18,14 +18,14 @@ import java.util.Optional;
 @Service
 public class TelevisionService {
 
-  // DE SERVICELAAG COMMUNICEERT MET DE REPOSITORY
+    // DE SERVICELAAG COMMUNICEERT MET DE REPOSITORY
     // DE VARIABELE (OOK VOOR HET KOPPELEN VAN DE REMOTE)
     private final TelevisionRepository televisionRepository;
     private final RemoteControllerRepository remoteControllerRepository;
 
     // GENERATE DE CONSTRUCTOR (+ REMOTECONTROLLER)
-    public TelevisionService (TelevisionRepository televisionRepository,
-                              RemoteControllerRepository remoteControllerRepository) {
+    public TelevisionService(TelevisionRepository televisionRepository,
+                             RemoteControllerRepository remoteControllerRepository) {
         this.televisionRepository = televisionRepository;
         this.remoteControllerRepository = remoteControllerRepository;
     }
@@ -41,7 +41,7 @@ public class TelevisionService {
         List<Television> tvList = televisionRepository.findAll();
         List<TelevisionDto> tvDtoList = new ArrayList<>();
 
-        for(Television tv : tvList) {
+        for (Television tv : tvList) {
             TelevisionDto dto = transferToDto(tv);
             tvDtoList.add(dto);
         }
@@ -57,7 +57,7 @@ public class TelevisionService {
         List<Television> tvList = televisionRepository.findAllTelevisionsByBrandEqualsIgnoreCase(brand);
         List<TelevisionDto> tvDtoList = new ArrayList<>();
 
-        for(Television tv : tvList) {
+        for (Television tv : tvList) {
             TelevisionDto dto = transferToDto(tv);
             tvDtoList.add(dto);
         }
@@ -73,14 +73,13 @@ public class TelevisionService {
     public TelevisionDto getTelevisionById(Long id) {
         Optional<Television> televisionOptional = televisionRepository.findById(id);
 
-        if (televisionOptional.isPresent()){
+        if (televisionOptional.isPresent()) {
             Television tv = televisionOptional.get();
             return transferToDto(tv);
         } else {
             throw new RecordNotFoundException("geen televisie gevonden");
         }
     }
-
 
 
     // DIT IS DE METHODE VOOR HET TOEVOEGEN VAN 1 TELEVISIE IN DE REPOSITORY
@@ -118,7 +117,8 @@ public class TelevisionService {
     public TelevisionDto updateTelevision(Long id, TelevisionInputDto newTelevision) {
 
         Optional<Television> televisionOptional = televisionRepository.findById(id);
-        if (televisionOptional.isPresent()){
+
+        if (televisionOptional.isPresent()) {
 
             Television television1 = televisionOptional.get();
 
@@ -147,7 +147,7 @@ public class TelevisionService {
 
         } else {
 
-            throw new  RecordNotFoundException("geen televisie gevonden");
+            throw new RecordNotFoundException("geen televisie gevonden");
 
         }
 
@@ -155,8 +155,8 @@ public class TelevisionService {
 
 // DIT IS DE METHOD VOOR HET VERTALEN VAN DE UPDATE NAAR DE TELEVISION IN DE REPOSITORY
 
-    public Television transferToTelevision(TelevisionInputDto dto){
-        var television = new Television();
+    public Television transferToTelevision(TelevisionInputDto dto) {
+        Television television = new Television();
 
         television.setType(dto.getType());
         television.setBrand(dto.getBrand());
@@ -179,7 +179,7 @@ public class TelevisionService {
     }
 
     // DIT IS DE METHOD VOOR HET VERTALEN VAN DE TELEVISIE NAAR DE DTO IN DE CONTROLLER
-    public TelevisionDto transferToDto(Television television){
+    public TelevisionDto transferToDto(Television television) {
         TelevisionDto dto = new TelevisionDto();
 
         dto.setId(television.getId());
@@ -202,4 +202,21 @@ public class TelevisionService {
 
         return dto;
     }
+
+    public void assignRemoteControllerToTelevision(Long id, Long remoteControllerId) {
+        
+        Optional<Television> optionalTelevision = televisionRepository.findById(id);
+        Optional<RemoteController> optionalRemoteController = remoteControllerRepository.findById(remoteControllerId);
+
+        if (optionalTelevision.isPresent() && optionalRemoteController.isPresent()) {
+            Television television = optionalTelevision.get();
+            RemoteController remoteController = optionalRemoteController.get();
+
+            television.setRemoteController(remoteController);
+            televisionRepository.save(television);
+        } else {
+            throw new RecordNotFoundException();
+        }
+    }
+
 }

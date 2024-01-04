@@ -1,5 +1,6 @@
 package nl.novi.techiteasy1121.controllers;
 
+import nl.novi.techiteasy1121.dtos.id.IdInputDto;
 import nl.novi.techiteasy1121.dtos.television.TelevisionDto;
 import nl.novi.techiteasy1121.dtos.television.TelevisionInputDto;
 import nl.novi.techiteasy1121.services.TelevisionService;
@@ -95,6 +96,15 @@ public class TelevisionController {
         TelevisionDto dto = televisionService.updateTelevision(id, newTelevision);
 
         return ResponseEntity.ok().body(dto);
+    }
+
+
+    // MET DEZE METHODE WORDT DE ENTITEIT REMOTECONTROLLER TOEGEVOEGD AAN DE TELEVISION
+    // DE RESPONSEENTITY IS OBJECT? WANT JE KRIJGT NIETS TERUG(NOCONTENT)? ALLEEN EEN KOPPPELING GEMAAKT(BUILD)?
+    @PutMapping("/televisions/{id}/remotecontroller")
+    public ResponseEntity<Object> assignRemoteControllerToTelevision(@PathVariable("id") Long id,@Valid @RequestBody IdInputDto input) {
+        televisionService.assignRemoteControllerToTelevision(id, input.id);
+        return ResponseEntity.noContent().build();
     }
 
 }

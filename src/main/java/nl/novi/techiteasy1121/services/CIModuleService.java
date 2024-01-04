@@ -22,7 +22,7 @@ public class CIModuleService {
     public CIModuleService(CIModuleRepository ciModuleRepository) {
         this.ciModuleRepository = ciModuleRepository;
     }
-}
+
 
 // DE SERVICELAAG FUNCTIONS
     // GET ALL ENTITIES
@@ -46,7 +46,8 @@ public List<CIModuleDto> getAllCIModules() {
 }
 
     public CIModuleDto getCIModule(Long id) {
-        Optional<CIModule> ciModuleOptional = CIModuleRepository.findById(id);
+
+        Optional<CIModule> ciModuleOptional = ciModuleRepository.findById(id);
 
         if (ciModuleOptional.isPresent()) {
             CIModule ciModule = ciModuleOptional.get();
