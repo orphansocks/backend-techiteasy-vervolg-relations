@@ -1,16 +1,26 @@
 package nl.novi.techiteasy1121.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Getter
+@Setter
 
 @Entity
+@Table(name = "televisions")
 public class Television {
 
-    //  Een entiteit moet een primary key bevatten(id)
+    //  DE PRIMARY KEY WORDT AUTOMATISCH GEGENEREERD
     @Id
-    @GeneratedValue
-    Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // + optioneel meegeven van parameter hoe je de generatedvalue moet genereren
+    private Long id;
 
-    //  variable declaraties
+    // DE VARIABELEN
     private String type;
     private String brand;
     private String name;
@@ -28,184 +38,42 @@ public class Television {
     private Integer originalStock;
     private Integer sold;
 
-//    constructors hoeven niet per se aangemaakt te worden
-//    // Een default constructor
-//    public Television() {}
-//
-//    // Een constructor met alle gevraagde variable
-//    public Television(
-//            Long id,
-//            String type,
-//            String brand,
-//            String name,
-//            Double price,
-//            Double availableSize,
-//            Double refreshRate,
-//            String screenType,
-//            String screenQuality,
-//            Boolean smartTv,
-//            Boolean wifi,
-//            Boolean voiceControl,
-//            Boolean hdr,
-//            Boolean bluetooth,
-//            Boolean ambiLight,
-//            Integer originalStock,
-//            Integer sold ) {
-//        this.id = id;
-//        this.type = type;
-//        this.brand = brand;
-//        this.name = name;
-//        this.price = price;
-//        this.availableSize = availableSize;
-//        this.refreshRate = refreshRate;
-//        this.screenType = screenType;
-//        this.screenQuality = screenQuality;
-//        this.smartTv = smartTv;
-//        this.wifi = wifi;
-//        this.voiceControl = voiceControl;
-//        this.hdr = hdr;
-//        this.bluetooth = bluetooth;
-//        this.ambiLight = ambiLight;
-//        this.originalStock = originalStock;
-//        this.sold = sold;
-//    }
 
-    //  Alle variable getters
-    public Long getId() {
-        return id;
-    }
+    // DE RELATIES
 
-    public String getType() {
-        return type;
-    }
+    // ER IS 1 REMOTE CONTROLLER VOOR 1 TV
+    // JE HOEFT DUS GEEN LIJST AAN TE MAKEN
+    // DIT IS DE OWNER KANT VAN DE RELATIE
+    @OneToOne
+    private RemoteController remoteController;
 
-    public String getBrand() {
-        return brand;
-    }
+    // EEN TV KAN 1 KAART HEBBEN, MAAR EEN KAART KAN IN MEERDERE TVS ZITTEN
+    // DUS DE OWNERKANT/ DE MANY-KANT IS TELEVISIONS DIE DE JUISTE CIMODULE OPHAALT
+    // FETCHTYPE IS NIET IN DE LES BESPROKEN
+    // EAGER BIJ HEEL VEEL DATA KOST VEEL TIJD (BIJV FOTO"S OP TE HALEN)
+    // LAZY HAALT PAS FOTOS OP ALS DE GET DAAR SPECIFIEK OM VRAAGT = SNELLER BIJ VEEL DATA
+    @ManyToOne(fetch = FetchType.EAGER)
+    private CIModule CIModule;
 
-    public String getName() {
-        return name;
-    }
+    // ER KUNNEN MEERDERE TELEVISIES OP MEERDERE WALLBRACKETS
+    // DUS JE MAAKT EEN LIJST AAN WAAR DIE WALLBRACKETS IN ZITTEN
+    // IN DIT GEVAL EEN HASH SET - HOUDT REKENING MET DUPLICATES
+    // OOK MOET EEN GEZAMENLIJKE TABEL WORDEN AANGEMAAKT
+    @ManyToMany(fetch = FetchType.EAGER)
+    // LAZY = fetch when needed (LAZY LOADING)
+    // EAGER = fetch immediately
+    @JoinTable(
+            name = "televisions_wallBrackets",
+            joinColumns = @JoinColumn(name = "wallBrackets_id"),
+            inverseJoinColumns = @JoinColumn(name = "television_id")
+    )
 
-    public Double getPrice() {
-        return price;
-    }
+    private Set<WallBracket> wallBrackets = new HashSet<>();
 
-    public Double getAvailableSize() {
-        return availableSize;
-    }
 
-    public Double getRefreshRate() {
-        return refreshRate;
-    }
 
-    public String getScreenType() {
-        return screenType;
-    }
+    //  ALLE GETTERS NU VIA LOMBOK
+    //  ALLE SETTERS NU VIA LOMBOK
 
-    public String getScreenQuality() {
-        return screenQuality;
-    }
-
-    public Boolean getSmartTv() {
-        return smartTv;
-    }
-
-    public Boolean getWifi() {
-        return wifi;
-    }
-
-    public Boolean getVoiceControl() {
-        return voiceControl;
-    }
-
-    public Boolean getHdr() {
-        return hdr;
-    }
-
-    public Boolean getBluetooth() {
-        return bluetooth;
-    }
-
-    public Boolean getAmbiLight() {
-        return ambiLight;
-    }
-
-    public Integer getOriginalStock() {
-        return originalStock;
-    }
-
-    public Integer getSold() {
-        return sold;
-    }
-
-    //  Alle variable setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public void setAvailableSize(Double availableSize) {
-        this.availableSize = availableSize;
-    }
-
-    public void setRefreshRate(Double refreshRate) {
-        this.refreshRate = refreshRate;
-    }
-
-    public void setScreenType(String screenType) {
-        this.screenType = screenType;
-    }
-
-    public void setScreenQuality(String screenQuality) {
-        this.screenQuality = screenQuality;
-    }
-
-    public void setSmartTv(Boolean smartTv) {
-        this.smartTv = smartTv;
-    }
-
-    public void setWifi(Boolean wifi) {
-        this.wifi = wifi;
-    }
-
-    public void setVoiceControl(Boolean voiceControl) {
-        this.voiceControl = voiceControl;
-    }
-
-    public void setHdr(Boolean hdr) {
-        this.hdr = hdr;
-    }
-
-    public void setBluetooth(Boolean bluetooth) {
-        this.bluetooth = bluetooth;
-    }
-
-    public void setAmbiLight(Boolean ambiLight) {
-        this.ambiLight = ambiLight;
-    }
-
-    public void setOriginalStock(Integer originalStock) {
-        this.originalStock = originalStock;
-    }
-
-    public void setSold(Integer sold) {
-        this.sold = sold;
-    }
 
 }
